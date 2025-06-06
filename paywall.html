@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your AIQ Results</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #e0f2ff, #ffffff);
+      padding: 3em;
+      color: #1a1a1a;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 2em;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 1em;
+      font-weight: 800;
+      color: #003366;
+    }
+    .score {
+      font-size: 2.5em;
+      color: #007BFF;
+      font-weight: 800;
+    }
+    ul {
+      text-align: left;
+      margin-top: 1em;
+    }
+    ul li {
+      margin-bottom: 0.75em;
+      font-size: 1em;
+    }
+    button {
+      background-color: #007BFF;
+      border: none;
+      color: white;
+      padding: 0.75em 2em;
+      border-radius: 999px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 2em;
+    }
+    button:hover {
+      background-color: #005bb5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Your AIQ Score</h1>
+    <p class="score" id="score"></p>
+    <p>You are a <strong id="tier"></strong>.</p>
+
+    <div id="recommendations">
+      <h2>Recommended Next Steps</h2>
+      <ul id="suggestions-list"></ul>
+    </div>
+
+    <button onclick="alert('Pretend payment completed 🎉')">Unlock Full AI Path</button>
+  </div>
+
+  <script>
+    const score = localStorage.getItem('aiScore');
+    const tier = localStorage.getItem('aiTier');
+    document.getElementById('score').textContent = score;
+    document.getElementById('tier').textContent = tier;
+
+    const suggestions = {
+      "AI Beginner": [
+        "Watch: How to Prompt ChatGPT",
+        "Try: AI Templates in Docs",
+        "Explore: AI Newsletters"
+      ],
+      "AI Explorer": [
+        "Use: Multi-modal AI tools",
+        "Create: Chatbots for your site",
+        "Automate: Workflows with Zapier"
+      ],
+      "AI Mastermind": [
+        "Build: Your own GPT app",
+        "Launch: AI-based startup ideas",
+        "Monetize: AI consulting"
+      ]
+    };
+
+    const list = document.getElementById('suggestions-list');
+    suggestions[tier].forEach(item => {
+      const li = document.createElement('li');
+      li.textContent = item;
+      list.appendChild(li);
+    });
+  </script>
+</body>
+</html>

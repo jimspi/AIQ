@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AIQ — Elevate Your AI Game</meta>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(to right, #e0f2ff, #ffffff); padding: 3em; color: #1a1a1a; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 2em; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.05); text-align: center; }
+    h1 { font-size: 2em; margin-bottom: 1em; font-weight: 800; color: #003366; }
+    .step { display: none; }
+    .step.active { display: block; animation: fade 0.4s ease-in-out; }
+    @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    button { background-color: #007BFF; border: none; color: white; padding: 0.75em 2em; margin: 0.5em; border-radius: 999px; font-size: 1em; font-weight: 600; cursor: pointer; transition: background-color 0.3s ease; }
+    button:hover { background-color: #005bb5; }
+    textarea { width: 100%; padding: 1em; border-radius: 12px; border: 1px solid #ccc; margin-top: 1em; font-size: 1em; }
+    .loader { display: none; font-size: 1.3em; color: #007BFF; font-weight: 600; }
+    img { width: 140px; margin-bottom: 1.5em; }
+    .progress-container { background: #e9f5ff; border-radius: 10px; height: 10px; width: 100%; margin-bottom: 1em; }
+    #progressBar { background: #007BFF; height: 10px; width: 0; border-radius: 10px; transition: width 0.3s ease; }
+    #progressPercent { font-size: 0.9em; color: #555; margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="progress-container"><div id="progressBar"></div></div>
+    <div id="progressPercent">0% Complete</div>
+    <img src="logo.png" alt="AIQ Logo">
+    <h1>How AI Are You?</h1>
+    <form id="assessmentForm">
+      <div class="step active" data-step>
+        <p>Do you regularly use ChatGPT or another AI chatbot?</p>
+        <button type="button" onclick="recordAnswer(10)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Have you ever created a custom GPT or AI agent?</p>
+        <button type="button" onclick="recordAnswer(15)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Have you used AI in content creation (writing, video, design)?</p>
+        <button type="button" onclick="recordAnswer(10)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Do you understand how prompting affects AI output?</p>
+        <button type="button" onclick="recordAnswer(10)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Have you connected AI tools to other apps (e.g., Zapier, APIs)?</p>
+        <button type="button" onclick="recordAnswer(15)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Do you know the difference between GPT-3.5 and GPT-4?</p>
+        <button type="button" onclick="recordAnswer(10)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Have you used AI tools in your job or business?</p>
+        <button type="button" onclick="recordAnswer(15)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Have you trained or fine-tuned an AI model (even lightly)?</p>
+        <button type="button" onclick="recordAnswer(20)">Yes</button>
+        <button type="button" onclick="recordAnswer(0)">No</button>
+      </div>
+      <div class="step" data-step>
+        <p>Which AI tools have you used?</p>
+        <label><input type="checkbox" name="tools" value="ChatGPT"> ChatGPT</label><br>
+        <label><input type="checkbox" name="tools" value="Claude"> Claude</label><br>
+        <label><input type="checkbox" name="tools" value="HeyGen"> HeyGen</label><br>
+        <label><input type="checkbox" name="tools" value="Midjourney"> Midjourney</label><br>
+        <label><input type="checkbox" name="tools" value="Gemini"> Gemini</label><br>
+        <button type="button" onclick="recordTools()">Next</button>
+      </div>
+      <div class="step" data-step>
+        <p>What AI projects, services, or tools have you built?</p>
+        <textarea id="projects" rows="5" placeholder="e.g., Built a personal GPT that summarizes meetings..."></textarea><br>
+        <button type="button" onclick="calculateScore()">Calculate My Score</button>
+      </div>
+    </form>
+    <div class="loader" id="loading">Calculating your AI Score...</div>
+  </div>
+  <script src="scripts/fullflow.js"></script>
+</body>
+</html>
