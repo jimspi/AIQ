@@ -73,14 +73,23 @@
         <button type="button" onclick="recordAnswer(0)">No</button>
       </div>
       <div class="step" data-step>
-        <p>Which AI tools have you used?</p>
-        <label><input type="checkbox" name="tools" value="ChatGPT"> ChatGPT</label><br>
-        <label><input type="checkbox" name="tools" value="Claude"> Claude</label><br>
-        <label><input type="checkbox" name="tools" value="HeyGen"> HeyGen</label><br>
-        <label><input type="checkbox" name="tools" value="Midjourney"> Midjourney</label><br>
-        <label><input type="checkbox" name="tools" value="Gemini"> Gemini</label><br>
-        <button type="button" onclick="recordTools()">Next</button>
-      </div>
+  <p>Which AI tools have you used?</p>
+  <div class="checkbox-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5em 1em; text-align: left; padding-left: 1em;">
+    <label><input type="checkbox" name="tools" value="ChatGPT"> ChatGPT</label>
+    <label><input type="checkbox" name="tools" value="Claude"> Claude</label>
+    <label><input type="checkbox" name="tools" value="Gemini"> Gemini</label>
+    <label><input type="checkbox" name="tools" value="Midjourney"> Midjourney</label>
+    <label><input type="checkbox" name="tools" value="DALL·E"> DALL·E</label>
+    <label><input type="checkbox" name="tools" value="Perplexity"> Perplexity</label>
+    <label><input type="checkbox" name="tools" value="Microsoft Copilot"> Microsoft Copilot</label>
+    <label><input type="checkbox" name="tools" value="HeyGen"> HeyGen</label>
+    <label><input type="checkbox" name="tools" value="Runway"> Runway</label>
+    <label><input type="checkbox" name="tools" value="Notion AI"> Notion AI</label>
+    <label><input type="checkbox" name="tools" value="Poe"> Poe</label>
+    <label><input type="checkbox" name="tools" value="Firefly"> Adobe Firefly</label>
+  </div>
+  <button type="button" onclick="recordTools()">Next</button>
+</div>
       <div class="step" data-step>
         <p>What AI projects, services, or tools have you built?</p>
         <textarea id="projects" rows="5" placeholder="e.g., Built a personal GPT that summarizes meetings..."></textarea><br>
