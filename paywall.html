@@ -58,6 +58,19 @@
     .cta:hover {
       background-color: #005bb5;
     }
+    .spinner {
+      border: 6px solid #cce7ff;
+      border-top: 6px solid #007BFF;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 2em auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
@@ -66,8 +79,8 @@
     <div class="score" id="scoreDisplay">...</div>
     <div class="tier" id="tierDisplay">...</div>
     <div id="spinner" class="spinner"></div>
-<div class="message" id="customMessage" style="display: none;"></div>
-<a href="/" class="cta" id="ctaButton" style="display: none;">Level Up</a>
+    <div class="message" id="customMessage" style="display: none;"></div>
+    <a href="/" class="cta" id="ctaButton" style="display: none;">Level Up</a>
   </div>
   <script>
     const score = parseInt(localStorage.getItem('aiScore') || '0', 10);
@@ -87,9 +100,15 @@
           body: JSON.stringify({ score, tier, tools, answers, projects })
         });
         const data = await response.json();
-        document.getElementById('customMessage').innerText = data.message || 'Thanks for completing the assessment.';
+        const fullMessage = (data.message || 'Thanks for completing the assessment.') + ' You can benefit from learning new skills and consider leveling up.';
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('customMessage').innerText = fullMessage;
+        document.getElementById('customMessage').style.display = 'block';
+        document.getElementById('ctaButton').style.display = 'inline-block';
       } catch (error) {
+        document.getElementById('spinner').style.display = 'none';
         document.getElementById('customMessage').innerText = 'We couldn’t generate a custom message right now. Try again later.';
+        document.getElementById('customMessage').style.display = 'block';
       }
     }
 
@@ -97,5 +116,6 @@
   </script>
 </body>
 </html>
+
 
 
