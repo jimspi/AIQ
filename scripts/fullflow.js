@@ -52,5 +52,7 @@ function getTier(score) {
   return 'AI Beginner';
 }
 
-// Initialize
-updateProgressBar();
+window.addEventListener('DOMContentLoaded', () => {
+  updateProgressBar();
+});
+
