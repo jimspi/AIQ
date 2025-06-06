@@ -51,20 +51,35 @@
     <div class="message" id="customMessage">...</div>
   </div>
   <script>
-    const score = parseInt(localStorage.getItem('aiScore') || '0', 10);
-    const tier = localStorage.getItem('aiTier') || 'Unknown';
+  const score = parseInt(localStorage.getItem('aiScore') || '0', 10);
+  const tier = localStorage.getItem('aiTier') || 'Unknown';
 
-    document.getElementById('scoreDisplay').innerText = score;
-    document.getElementById('tierDisplay').innerText = tier;
+  document.getElementById('scoreDisplay').innerText = score;
+  document.getElementById('tierDisplay').innerText = tier;
 
-    let message = '';
-    if (score < 40) {
-      message = "You're just getting started. With a little guidance, you can unlock powerful new AI skills.";
-    } else if (score < 80) {
-      message = "You're making solid progress. Keep experimenting and exploring new tools — your AI potential is real.";
-    } else {
-      message = "You're ahead of the curve. You’ve clearly spent time in the lab. Keep building and leading the charge.";
+  async function fetchCustomMessage() {
+    try {
+      const response = await fetch('https://your-api-endpoint.com/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score,
+          tier,
+          tools: JSON.parse(localStorage.getItem('aiTools') || '[]'),
+          answers: JSON.parse(localStorage.getItem('aiAnswers') || '[]'),
+          projects: localStorage.getItem('aiProjects') || ''
+        })
+      });
+      const data = await response.json();
+      document.getElementById('customMessage').innerText = data.message || 'Thanks for completing the assessment.';
+    } catch (error) {
+      document.getElementById('customMessage').innerText = 'We couldn’t generate a custom message right now. Try again later.';
     }
+  }
+
+  fetchCustomMessage();
+</script>
+
 
     document.getElementById('customMessage').innerText = message;
   </script>
