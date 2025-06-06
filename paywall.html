@@ -65,8 +65,9 @@
     <h1>Your AIQ Score</h1>
     <div class="score" id="scoreDisplay">...</div>
     <div class="tier" id="tierDisplay">...</div>
-    <div class="message" id="customMessage">...</div>
-    <a href="/" class="cta">Retake the Assessment</a>
+    <div id="spinner" class="spinner"></div>
+<div class="message" id="customMessage" style="display: none;"></div>
+<a href="/" class="cta" id="ctaButton" style="display: none;">Level Up</a>
   </div>
   <script>
     const score = parseInt(localStorage.getItem('aiScore') || '0', 10);
