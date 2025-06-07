@@ -58,21 +58,31 @@
       const answers = JSON.parse(localStorage.getItem('aiAnswers') || '[]');
       const projects = localStorage.getItem('aiProjects') || '';
 
-      const res = await fetch('/api/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score, tier, tools, answers, projects, type: 'recommendation' })
-      });
+      try {
+        const res = await fetch('/api/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ score, tier, tools, answers, projects, type: 'recommendation' })
+        });
 
-      const data = await res.json();
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('plan').innerHTML = data.html || '<p>Unable to load recommendations.</p>';
+        if (!res.ok) {
+          throw new Error(`API responded with status ${res.status}`);
+        }
+
+        const data = await res.json();
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('plan').innerHTML = data.html || '<p>No personalized recommendations available.</p>';
+      } catch (err) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('plan').innerHTML = `<p>Error loading plan: ${err.message}</p>`;
+      }
     }
 
     loadPlan();
   </script>
 </body>
 </html>
+
 
 
 
