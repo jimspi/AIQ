@@ -1,0 +1,39 @@
+// /api/recommend.js (Next.js API route style or Node Express equivalent)
+
+import { Configuration, OpenAIApi } from 'openai';
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { score, tier, tools, answers, projects } = req.body;
+
+  const prompt = `You are a smart AI mentor. Based on the user's AI score (${score}) and tier (${tier}), along with these tools used: ${tools.join(", ")}, answers: ${answers.join(", ")}, and project experience: ${projects}, create a custom AI learning plan. Include:
+
+- A headline
+- 3 skill gaps to focus on
+- 3 specific recommended actions to improve
+- 3 curated resources (URLs, if known)
+
+Return the content as styled HTML (using <div class='recommendation'> blocks) without wrapping it in <html> or <body> tags.`;
+
+  try {
+    const completion = await openai.createChatCompletion({
+      model: 'gpt-4',
+      messages: [{ role: 'user', content: prompt }],
+      temperature: 0.7,
+    });
+
+    const message = completion.data.choices[0].message.content;
+    res.status(200).json({ html: message });
+  } catch (error) {
+    console.error('OpenAI error:', error);
+    res.status(500).json({ error: 'Failed to generate learning plan.' });
+  }
+}
