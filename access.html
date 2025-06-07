@@ -60,6 +60,30 @@
     .cta:hover {
       background-color: #005bb5;
     }
+    .flashcard {
+      background: #eef6ff;
+      border-radius: 12px;
+      margin: 1em 0;
+      padding: 1em;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .flashcard:hover {
+      transform: scale(1.02);
+    }
+    .flashcard .question { font-weight: 600; color: #0056b3; }
+    .flashcard .answer { display: none; margin-top: 0.5em; color: #333; }
+    .flashcard.flipped .answer { display: block; }
+    .copy-button, .send-button {
+      background-color: #007BFF;
+      color: white;
+      padding: 0.5em 1em;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 1em 0.5em;
+    }
   </style>
 </head>
 <body>
@@ -67,34 +91,61 @@
     <h1>You're In. Let's Level Up.</h1>
     <p>Based on your AIQ score, here’s your personalized learning path:</p>
 
-    <div class="recommendation">
-      <h3>🧠 Core Skill Gaps</h3>
-      <ul>
-        <li>Prompt engineering basics</li>
-        <li>Understanding LLM capabilities and limits</li>
-        <li>Hands-on with tools like ChatGPT, Claude, Gemini</li>
-      </ul>
+    <div id="dynamicContent">
+      <p>Loading your learning plan...</p>
     </div>
 
-    <div class="recommendation">
-      <h3>🚀 Recommended Actions</h3>
-      <ul>
-        <li>Enroll in a short-form AI bootcamp</li>
-        <li>Start a small automation or productivity project</li>
-        <li>Use your existing role as a sandbox for applying AI</li>
-      </ul>
-    </div>
-
-    <div class="recommendation">
-      <h3>📚 Top Resources</h3>
-      <ul>
-        <li><a href="https://learnprompting.org" target="_blank">Learn Prompting</a></li>
-        <li><a href="https://aicamp.ai" target="_blank">AI Camp</a></li>
-        <li><a href="https://openai.com/blog/chatgpt-plugins" target="_blank">OpenAI Plugin Examples</a></li>
-      </ul>
-    </div>
+    <div id="flashcards"></div>
+    <button class="copy-button" onclick="copyFlashcards()">Copy Quiz</button>
+    <button class="send-button" onclick="alert('Send feature coming soon')">Send Quiz</button>
 
     <a class="cta" href="/">Return Home</a>
   </div>
+
+  <script>
+    const score = parseInt(localStorage.getItem('aiScore') || '0');
+    const tier = localStorage.getItem('aiTier') || 'Unknown';
+    const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
+    const answers = JSON.parse(localStorage.getItem('aiAnswers') || '[]');
+    const projects = localStorage.getItem('aiProjects') || '';
+
+    async function fetchRecommendations() {
+      const res = await fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score, tier, tools, answers, projects })
+      });
+      const data = await res.json();
+      document.getElementById('dynamicContent').innerHTML = data.html;
+    }
+
+    async function fetchFlashcards() {
+      const res = await fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score, tier, tools, answers, projects, type: 'flashcards' })
+      });
+      const data = await res.json();
+      const cards = JSON.parse(data.flashcards || '[]');
+      const container = document.getElementById('flashcards');
+      container.innerHTML = cards.map(c => `
+        <div class="flashcard" onclick="this.classList.toggle('flipped')">
+          <div class="question">Q: ${c.q}</div>
+          <div class="answer">A: ${c.a}</div>
+        </div>
+      `).join('');
+    }
+
+    function copyFlashcards() {
+      const cards = [...document.querySelectorAll('.flashcard')]
+        .map(card => card.innerText).join('\n\n');
+      navigator.clipboard.writeText(cards);
+      alert('Quiz copied to clipboard!');
+    }
+
+    fetchRecommendations();
+    fetchFlashcards();
+  </script>
 </body>
 </html>
+
