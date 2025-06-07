@@ -38,7 +38,7 @@ Only return HTML.`
     ];
 
     const completion = await openai.createChatCompletion({
-      model: 'gpt3.5-turbo',
+      model: 'gpt-3.5-turbo',
       messages,
       temperature: 0.7
     });
