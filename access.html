@@ -3,43 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your AIQ Learning Plan</title>
+  <title>Your AIQ Plan</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background: #f4faff;
-      margin: 0;
-      padding: 2em;
-      color: #222;
+      background: linear-gradient(to right, #ffffff, #e0f7ff);
+      color: #1a1a1a;
+      padding: 4em;
+      text-align: center;
     }
     .container {
-      max-width: 800px;
+      max-width: 720px;
       margin: auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+      padding: 3em;
     }
     h1 {
-      text-align: center;
+      font-size: 2em;
+      font-weight: 800;
       color: #003366;
-    }
-    .spinner {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100px;
-    }
-    .loader {
-      border: 8px solid #e0f0ff;
-      border-top: 8px solid #007bff;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .content {
-      margin-top: 2em;
+      margin-bottom: 0.25em;
     }
     .score-highlight {
       color: #007bff;
@@ -48,49 +34,54 @@
       margin: 1em 0;
       text-align: center;
     }
+    .loading {
+      font-size: 1.2em;
+      color: #555;
+      margin-top: 2em;
+    }
+    .recommendation {
+      text-align: left;
+      font-size: 1em;
+      margin-top: 2em;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Your Personalized AI Learning Plan</h1>
-    <div id="scoreDisplay" class="score-highlight"></div>
-    <div id="loading" class="spinner"><div class="loader"></div></div>
-    <div id="plan" class="content"></div>
+    <h1>Your Personalized AIQ Plan</h1>
+    <div class="score-highlight" id="scoreDisplay"></div>
+    <div class="loading" id="loading">Loading your learning plan...</div>
+    <div class="recommendation" id="recommendationContainer"></div>
   </div>
 
   <script>
-    async function loadPlan() {
-      const score = localStorage.getItem('aiScore');
-      const tier = localStorage.getItem('aiTier');
-      const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
-      const answers = JSON.parse(localStorage.getItem('aiAnswers') || '[]');
-      const projects = localStorage.getItem('aiProjects') || '';
+    const score = localStorage.getItem('aiScore');
+    const tier = localStorage.getItem('aiTier');
+    const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
+    const projects = localStorage.getItem('aiProjects') || '';
 
-      if (score && tier) {
-        document.getElementById('scoreDisplay').innerText = `Your Score: ${score} (${tier})`;
-      }
+    if (score && tier) {
+      document.getElementById('scoreDisplay').innerText = `Your Score: ${score} (${tier})`;
 
-      try {
-        const res = await fetch('/api/recommend', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ score, tier, tools, answers, projects, type: 'recommendation' })
+      fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score, tier, tools, projects })
+      })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('recommendationContainer').innerHTML = data.html || '<p>No personalized recommendations available.</p>';
+        })
+        .catch(err => {
+          document.getElementById('loading').innerText = 'Error loading plan.';
+          console.error(err);
         });
-
-        if (!res.ok) {
-          throw new Error(`API responded with status ${res.status}`);
-        }
-
-        const data = await res.json();
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('plan').innerHTML = data.html || '<p>No personalized recommendations available.</p>';
-      } catch (err) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('plan').innerHTML = `<p>Error loading plan: ${err.message}</p>`;
-      }
+    } else {
+      document.getElementById('scoreDisplay').innerText = "Unable to load your score.";
+      document.getElementById('loading').style.display = 'none';
     }
-
-    loadPlan();
   </script>
 </body>
 </html>
+
