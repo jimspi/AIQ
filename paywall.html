@@ -3,44 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your AIQ Score</title>
+  <title>AIQ Score Ready</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(to right, #e0f2ff, #ffffff);
+      background: linear-gradient(to right, #ffffff, #e0f7ff);
       color: #1a1a1a;
       padding: 4em;
       text-align: center;
     }
     .container {
-      max-width: 600px;
+      max-width: 720px;
       margin: auto;
       background: #fff;
       border-radius: 20px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
       padding: 3em;
     }
     h1 {
       font-size: 2em;
       font-weight: 800;
       color: #003366;
+      margin-bottom: 0.25em;
     }
-    .score {
-      font-size: 4em;
-      font-weight: bold;
-      color: #007BFF;
-      margin: 0.5em 0;
-    }
-    .tier {
-      font-size: 1.5em;
-      font-weight: 600;
-      margin-bottom: 1em;
-    }
-    .message {
+    p {
       font-size: 1.1em;
       color: #333;
-      margin-bottom: 2em;
+      margin-bottom: 1.5em;
     }
     .cta {
       display: inline-block;
@@ -58,64 +48,17 @@
     .cta:hover {
       background-color: #005bb5;
     }
-    .spinner {
-      border: 6px solid #cce7ff;
-      border-top: 6px solid #007BFF;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin: 2em auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Your AIQ Score</h1>
-    <div class="score" id="scoreDisplay">...</div>
-    <div class="tier" id="tierDisplay">...</div>
-    <div id="spinner" class="spinner"></div>
-    <div class="message" id="customMessage" style="display: none;"></div>
-    <a href="/unlock.html" class="cta" id="ctaButton" style="display: none;">Level Up</a>
+    <h1>Your AIQ Score is Ready</h1>
+    <p>Your personalized results have been calculated. Unlock your skill gaps, action plan, and flashcard quiz now.</p>
+    <a class="cta" href="/access.html">View My Plan</a>
   </div>
-  <script>
-    const score = parseInt(localStorage.getItem('aiScore') || '0', 10);
-    const tier = localStorage.getItem('aiTier') || 'Unknown';
-    const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
-    const answers = JSON.parse(localStorage.getItem('aiAnswers') || '[]');
-    const projects = localStorage.getItem('aiProjects') || '';
-
-    document.getElementById('scoreDisplay').innerText = score;
-    document.getElementById('tierDisplay').innerText = tier;
-
-    async function fetchCustomMessage() {
-      try {
-        const response = await fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ score, tier, tools, answers, projects })
-        });
-        const data = await response.json();
-        const fullMessage = (data.message || 'Thanks for completing the assessment.') + ' You can benefit from learning new skills and consider leveling up.';
-        document.getElementById('spinner').style.display = 'none';
-        document.getElementById('customMessage').innerText = fullMessage;
-        document.getElementById('customMessage').style.display = 'block';
-        document.getElementById('ctaButton').style.display = 'inline-block';
-      } catch (error) {
-        document.getElementById('spinner').style.display = 'none';
-        document.getElementById('customMessage').innerText = 'We couldn’t generate a custom message right now. Try again later.';
-        document.getElementById('customMessage').style.display = 'block';
-      }
-    }
-
-    fetchCustomMessage();
-  </script>
 </body>
 </html>
+
 
 
 
