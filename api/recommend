@@ -1,11 +1,3 @@
-// /api/recommend.js
-import { Configuration, OpenAIApi } from 'openai';
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -13,32 +5,22 @@ export default async function handler(req, res) {
 
   const { score, tier, tools, answers, projects, type } = req.body;
 
-  const prompt = type === 'flashcards'
-    ? `Create 5 flashcards that quiz a user based on their AI knowledge. Their score is ${score} and tier is ${tier}. They've used: ${tools.join(", ")}, and answered: ${answers.join(", ")}. Their project experience is: ${projects}. Each card should have a short question and clear answer. Return as JSON array like [{"q": "...", "a": "..."}].`
-    : `You are a smart AI mentor. Based on the user's AI score (${score}) and tier (${tier}), along with these tools used: ${tools.join(", ")}, answers: ${answers.join(", ")}, and project experience: ${projects}, create a custom AI learning plan. Include:
-- A headline
-- 3 skill gaps to focus on
-- 3 specific recommended actions to improve
-- 3 curated resources (URLs, if known)
-Return the content as styled HTML (using <div class='recommendation'> blocks) without wrapping it in <html> or <body> tags.`;
-
-  try {
-    const completion = await openai.createChatCompletion({
-      model: 'gpt-4',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.7,
-    });
-
-    const message = completion.data.choices[0].message.content;
-
-    if (type === 'flashcards') {
-      res.status(200).json({ flashcards: message });
-    } else {
-      res.status(200).json({ html: message });
-    }
-  } catch (error) {
-    console.error('OpenAI error:', error);
-    res.status(500).json({ error: 'Failed to generate content.' });
+  // Dummy GPT-style response logic (replace with your GPT call if you have an OpenAI proxy)
+  let message = "Based on your score and responses, here's a recommended learning path.";
+  if (score < 40) {
+    message = "You're at the start of your AI journey. Focus on foundational tools like ChatGPT and DALL·E.";
+  } else if (score < 70) {
+    message = "You have some experience. Try exploring prompt engineering and automation using Zapier or Make.";
+  } else {
+    message = "You're advanced! Push into fine-tuning, AI APIs, or building your own agents.";
   }
+
+  res.status(200).json({
+    html: `<p><strong>Your AIQ Tier:</strong> ${tier}</p>
+           <p><strong>Tools Used:</strong> ${tools.join(", ") || 'None listed'}</p>
+           <p><strong>Projects:</strong> ${projects || 'No projects entered'}</p>
+           <p>${message}</p>`
+  });
 }
+
 
