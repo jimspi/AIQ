@@ -38,11 +38,10 @@ Only return HTML.`
     ];
 
     const completion = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
-      messages,
-      temperature: 0.7
-    });
-
+  model: 'gpt-3.5-turbo',
+  messages,
+  temperature: 0.7
+});
     const html = completion.data.choices[0].message.content;
     res.status(200).json({ html });
   } catch (error) {
