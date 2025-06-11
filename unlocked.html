@@ -76,14 +76,14 @@
       font-size: 1em;
       margin-top: 2em;
     }
-    .actions {
+    .button-group {
       margin-top: 2em;
     }
-    .action-btn {
+    .btn {
       display: inline-block;
       background-color: #007bff;
       color: white;
-      padding: 0.75em 1.5em;
+      padding: 0.6em 1.5em;
       font-size: 1em;
       font-weight: 600;
       border-radius: 999px;
@@ -91,7 +91,7 @@
       margin: 0.5em;
       transition: background-color 0.3s ease;
     }
-    .action-btn:hover {
+    .btn:hover {
       background-color: #005bb5;
     }
   </style>
@@ -104,9 +104,9 @@
       Generating your learning plan...
     </div>
     <div class="recommendation" id="recommendationContainer"></div>
-    <div class="actions" id="actionButtons" style="display: none;">
-      <a class="action-btn" href="#" id="downloadBtn">Download My Plan</a>
-      <a class="action-btn" href="#" id="emailBtn">Email Me This Plan</a>
+    <div class="button-group" id="actionButtons" style="display:none;">
+      <a href="#" class="btn" onclick="downloadPlan()">Download My Plan</a>
+      <a href="#" class="btn" onclick="emailPlan()">Email Me This</a>
     </div>
   </div>
 
@@ -116,22 +116,23 @@
       return urlParams.get(key);
     }
 
-    const score = getParam('score') || localStorage.getItem('aiScore');
-    const tier = getParam('tier') || localStorage.getItem('aiTier');
-    const tools = getParam('tools')
-      ? decodeURIComponent(getParam('tools')).split(',')
-      : JSON.parse(localStorage.getItem('aiTools') || '[]');
-    const projects = getParam('projects') || localStorage.getItem('aiProjects') || '';
+    const score = getParam('score');
+    const tier = getParam('tier');
+    const tools = getParam('tools') ? decodeURIComponent(getParam('tools')).split(',') : [];
+    const projects = decodeURIComponent(getParam('projects') || '');
 
     document.getElementById('scoreDisplay').innerText = score || '—';
-
-    let rawHTML = '';
 
     if (score && tier) {
       fetch('/api/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score, tier, tools, projects })
+        body: JSON.stringify({
+          score,
+          tier,
+          tools,
+          projects
+        })
       })
       .then(res => res.json())
       .then(data => {
@@ -139,7 +140,6 @@
         const recommendationContainer = document.getElementById('recommendationContainer');
         if (data.html) {
           recommendationContainer.innerHTML = data.html;
-          rawHTML = data.html;
         } else {
           recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
         }
@@ -153,27 +153,25 @@
       document.getElementById('loading').innerText = "Missing data. Please re-take the assessment.";
     }
 
-    document.getElementById('downloadBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      const plainText = rawHTML.replace(/<[^>]+>/g, '').trim();
-      const blob = new Blob([plainText], { type: 'text/plain' });
+    function downloadPlan() {
+      const content = document.getElementById('recommendationContainer').innerHTML;
+      const blob = new Blob([content], { type: 'text/html' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'My-AIQ-Plan.txt';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    });
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'my-aiq-plan.html';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
 
-    document.getElementById('emailBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      const plainText = rawHTML.replace(/<[^>]+>/g, '').trim();
-      const subject = encodeURIComponent('My Custom AIQ Learning Plan');
-      const body = encodeURIComponent(plainText);
-      window.location.href = `mailto:?subject=${subject}&body=${body}`;
-    });
+    function emailPlan() {
+      const content = document.getElementById('recommendationContainer').innerText;
+      const mailtoLink = `mailto:?subject=My AIQ Learning Plan&body=${encodeURIComponent(content)}`;
+      window.location.href = mailtoLink;
+    }
   </script>
 </body>
 </html>
+
+
 
