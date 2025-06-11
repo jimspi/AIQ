@@ -29,9 +29,10 @@
     }
     .score-highlight {
       color: #007bff;
-      font-size: 3em;
-      font-weight: 800;
+      font-size: 4em;
+      font-weight: 900;
       margin: 1.5em 0 0.5em;
+      text-shadow: 1px 1px 8px rgba(0, 123, 255, 0.3);
     }
     .loading {
       font-size: 1.2em;
@@ -61,8 +62,8 @@
       background-color: #007bff;
       color: white;
       padding: 0.75em 2em;
-      font-size: 1em;
-      font-weight: 600;
+      font-size: 1.1em;
+      font-weight: 700;
       border-radius: 999px;
       text-decoration: none;
       margin-top: 2em;
@@ -82,7 +83,7 @@
       Loading your learning plan...
     </div>
     <div class="recommendation" id="recommendationContainer"></div>
-    <a class="cta-button" id="customHelpBtn" href="#" style="display:none">Get Custom Ways to Help Based on Your Score</a>
+    <a class="cta-button" id="customHelpBtn" href="#" style="display:none">Unlock Custom Strategies</a>
   </div>
 
   <script>
@@ -92,7 +93,7 @@
     const aiqProjects = localStorage.getItem('aiProjects') || '';
 
     if (aiqScore && aiqTier) {
-      document.getElementById('scoreDisplay').innerText = `${aiqScore}`;
+      document.getElementById('scoreDisplay').innerText = `AIR Score: ${aiqScore}`;
 
       fetch('/api/recommend', {
         method: 'POST',
@@ -128,6 +129,7 @@
   </script>
 </body>
 </html>
+
 
 
 
