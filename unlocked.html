@@ -111,15 +111,10 @@
   </div>
 
   <script>
-    function getParam(key) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(key);
-    }
-
-    const score = getParam('score');
-    const tier = getParam('tier');
-    const tools = getParam('tools') ? decodeURIComponent(getParam('tools')).split(',') : [];
-    const projects = decodeURIComponent(getParam('projects') || '');
+    const score = localStorage.getItem('aiScore');
+    const tier = localStorage.getItem('aiTier');
+    const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
+    const projects = localStorage.getItem('aiProjects') || '';
 
     document.getElementById('scoreDisplay').innerText = score || '—';
 
@@ -141,6 +136,8 @@
         const recommendationContainer = document.getElementById('recommendationContainer');
         if (data.html) {
           recommendationContainer.innerHTML = data.html;
+        } else if (data.message) {
+          recommendationContainer.innerHTML = `<p>${data.message}</p>`;
         } else {
           recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
         }
@@ -173,6 +170,7 @@
   </script>
 </body>
 </html>
+
 
 
 
