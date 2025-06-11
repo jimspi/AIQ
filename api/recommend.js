@@ -1,16 +1,19 @@
+// /api/recommend.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { score, tier, tools, answers, projects } = req.body;
+  const { score, tier, tools, answers, projects, purpose } = req.body;
 
-  const prompt = `A user just completed an AI skill self-assessment. Here's their profile:
+  const basePrompt = `A user just completed an AI skill self-assessment. Here's their profile:
 
 Score: ${score}
 Tier: ${tier}
 Tools Used: ${tools.join(', ') || 'None'}
-Project Summary: ${projects || 'None'}
+Project Summary: ${projects || 'None'}`;
+
+  const fullPlanPrompt = `${basePrompt}
 
 Generate a detailed, three-part AI learning and application plan tailored to their score and responses. Include:
 
@@ -19,6 +22,13 @@ Generate a detailed, three-part AI learning and application plan tailored to the
 3. One overlooked tool or strategy they likely aren't using — with clear instructions on how to start.
 
 Write in a helpful, motivating tone, and assume they just paid $25 for this, so overdeliver on value. Keep it digestible but insightful.`;
+
+  const teaserPrompt = `${basePrompt}
+
+Based on this, give a quick 2-sentence teaser of how AI could improve their work or projects — enough to show potential and build curiosity.`;
+
+  const prompt = purpose === 'full-plan-paid' ? fullPlanPrompt : teaserPrompt;
+
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -32,7 +42,7 @@ Write in a helpful, motivating tone, and assume they just paid $25 for this, so 
           { role: 'system', content: 'You are an expert AI learning coach.' },
           { role: 'user', content: prompt }
         ],
-        max_tokens: 100
+        max_tokens: purpose === 'full-plan-paid' ? 800 : 150
       })
     });
 
@@ -43,7 +53,8 @@ Write in a helpful, motivating tone, and assume they just paid $25 for this, so 
     console.error(error);
     res.status(500).json({ error: 'Failed to generate message' });
   }
-}// /api/recommend.js
+}
+pi/recommend.js
 
 
 
