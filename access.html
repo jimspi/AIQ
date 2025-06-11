@@ -29,20 +29,47 @@
     }
     .score-highlight {
       color: #007bff;
-      font-size: 2em;
-      font-weight: bold;
-      margin: 1em 0;
-      text-align: center;
+      font-size: 3em;
+      font-weight: 800;
+      margin: 1.5em 0 0.5em;
     }
     .loading {
       font-size: 1.2em;
       color: #555;
       margin-top: 2em;
     }
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 123, 255, 0.3);
+      border-top-color: #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 1em auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     .recommendation {
       text-align: left;
       font-size: 1em;
       margin-top: 2em;
+    }
+    .cta-button {
+      display: inline-block;
+      background-color: #007bff;
+      color: white;
+      padding: 0.75em 2em;
+      font-size: 1em;
+      font-weight: 600;
+      border-radius: 999px;
+      text-decoration: none;
+      margin-top: 2em;
+      transition: background-color 0.3s ease;
+    }
+    .cta-button:hover {
+      background-color: #005bb5;
     }
   </style>
 </head>
@@ -50,8 +77,12 @@
   <div class="container">
     <h1>Your Personalized AIQ Plan</h1>
     <div class="score-highlight" id="scoreDisplay"></div>
-    <div class="loading" id="loading">Loading your learning plan...</div>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      Loading your learning plan...
+    </div>
     <div class="recommendation" id="recommendationContainer"></div>
+    <a class="cta-button" id="customHelpBtn" href="#" style="display:none">Get Custom Ways to Help Based on Your Score</a>
   </div>
 
   <script>
@@ -61,7 +92,7 @@
     const aiqProjects = localStorage.getItem('aiProjects') || '';
 
     if (aiqScore && aiqTier) {
-      document.getElementById('scoreDisplay').innerText = `Your Score: ${aiqScore} (${aiqTier})`;
+      document.getElementById('scoreDisplay').innerText = `${aiqScore}`;
 
       fetch('/api/recommend', {
         method: 'POST',
@@ -84,6 +115,7 @@
         } else {
           recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
         }
+        document.getElementById('customHelpBtn').style.display = 'inline-block';
       })
       .catch(err => {
         document.getElementById('loading').innerText = 'Error loading plan.';
@@ -96,5 +128,6 @@
   </script>
 </body>
 </html>
+
 
 
