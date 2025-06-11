@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Custom AIQ Plan</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #ffffff, #e0f7ff);
+      color: #1a1a1a;
+      padding: 4em;
+      text-align: center;
+    }
+    .container {
+      max-width: 720px;
+      margin: auto;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+      padding: 3em;
+    }
+    .score-highlight {
+      position: relative;
+      display: inline-block;
+      color: #007bff;
+      font-size: 4.5em;
+      font-weight: 900;
+      margin: 1.5em 0 0.5em;
+      text-shadow: 2px 2px 16px rgba(0, 123, 255, 0.3);
+      animation: popIn 0.6s ease-out;
+    }
+    .score-highlight::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(0,123,255,0.2) 40%, transparent 70%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: pulse 1.5s infinite;
+      z-index: -1;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.7); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    @keyframes pulse {
+      0% { transform: translate(-50%, -50%) scale(1); opacity: 0.6; }
+      70% { transform: translate(-50%, -50%) scale(1.3); opacity: 0; }
+      100% { opacity: 0; }
+    }
+    .loading {
+      font-size: 1.2em;
+      color: #555;
+      margin-top: 2em;
+    }
+    .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 123, 255, 0.3);
+      border-top-color: #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 1em auto;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .recommendation {
+      text-align: left;
+      font-size: 1em;
+      margin-top: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="score-highlight" id="scoreDisplay">...</div>
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      Generating your learning plan...
+    </div>
+    <div class="recommendation" id="recommendationContainer"></div>
+  </div>
+
+  <script>
+    function getParam(key) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(key);
+    }
+
+    const score = getParam('score');
+    const tier = getParam('tier');
+    const tools = getParam('tools') ? decodeURIComponent(getParam('tools')).split(',') : [];
+    const projects = getParam('projects') || '';
+
+    document.getElementById('scoreDisplay').innerText = score || '—';
+
+    if (score && tier) {
+      fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score,
+          tier,
+          tools,
+          projects
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        const recommendationContainer = document.getElementById('recommendationContainer');
+        if (data.html) {
+          recommendationContainer.innerHTML = data.html;
+        } else {
+          recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
+        }
+      })
+      .catch(err => {
+        document.getElementById('loading').innerText = 'Error loading your custom plan.';
+        console.error(err);
+      });
+    } else {
+      document.getElementById('loading').innerText = "Missing data. Please re-take the assessment.";
+    }
+  </script>
+</body>
+</html>
