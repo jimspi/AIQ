@@ -1,21 +1,16 @@
-// /api/recommend.js
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
 
-import { OpenAIStream, StreamingTextResponse } from 'ai';
-import OpenAI from 'openai';
+  const { score, tier, tools, answers, projects } = req.body;
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const prompt = `A user just completed an AI skill self-assessment. Here's their profile:
 
-export const runtime = 'edge';
-
-export async function POST(req) {
-  const { score, tier, tools, projects, purpose } = await req.json();
-
-  const intro = `The user received an AIQ score of ${score} placing them in the "${tier}" tier. They listed these tools: ${tools.join(", ")} and described their AI use/project goals as: "${projects}".`;
-
-  let prompt = '';
-
-  if (purpose === 'full-plan-paid') {
-    prompt = `${intro}
+Score: ${score}
+Tier: ${tier}
+Tools Used: ${tools.join(', ') || 'None'}
+Project Summary: ${projects || 'None'}
 
 Generate a detailed, three-part AI learning and application plan tailored to their score and responses. Include:
 
@@ -24,35 +19,33 @@ Generate a detailed, three-part AI learning and application plan tailored to the
 3. One overlooked tool or strategy they likely aren't using — with clear instructions on how to start.
 
 Write in a helpful, motivating tone, and assume they just paid $25 for this, so overdeliver on value. Keep it digestible but insightful.`;
-  } else {
-    prompt = `${intro}
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4',
+        messages: [
+          { role: 'system', content: 'You are an expert AI learning coach.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 100
+      })
+    });
 
-Suggest one clear next step they should take to level up their AI capability based on their tier.`;
+    const data = await response.json();
+    const message = data.choices?.[0]?.message?.content?.trim() || 'Keep building your AI skills.';
+    res.status(200).json({ message });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to generate message' });
   }
+}// /api/recommend.js
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4',
-    stream: true,
-    messages: [
-      {
-        role: 'system',
-        content: 'You are an expert AI learning coach who gives custom recommendations based on users’ responses.',
-      },
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ],
-  });
 
-  const stream = OpenAIStream(response, {
-    onCompletion(completion) {
-      return JSON.stringify({ html: `<div>${completion}</div>` });
-    },
-  });
-
-  return new StreamingTextResponse(stream);
-}
 
 
 
