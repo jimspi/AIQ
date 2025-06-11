@@ -7,7 +7,7 @@ const loader = document.getElementById('loading');
 function updateProgressBar() {
   const progressBar = document.getElementById('progressBar');
   const totalSteps = steps.length;
-  const percent = Math.round((currentStep + 1) / totalSteps * 100);
+  const percent = Math.round((currentStep) / totalSteps * 100);
   progressBar.style.width = percent + '%';
   progressBar.setAttribute('aria-valuenow', percent);
   document.getElementById('progressPercent').innerText = `${percent}% Complete`;
