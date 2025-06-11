@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Your AIQ Plan</title>
+  <title>Your Custom AIQ Plan</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" />
   <style>
     body {
@@ -76,23 +76,6 @@
       font-size: 1em;
       margin-top: 2em;
     }
-    .progress-container {
-      width: 100%;
-      background: #e0ecff;
-      border-radius: 10px;
-      margin-top: 2em;
-      height: 14px;
-      box-shadow: inset 0 0 5px rgba(0, 123, 255, 0.3);
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #00c6ff, #0072ff);
-      transition: width 0.4s ease-in-out;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
-      width: 0%;
-    }
     .button-group {
       margin-top: 2em;
     }
@@ -118,37 +101,57 @@
     <div class="score-highlight" id="scoreDisplay">...</div>
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      Generating your learning plan...
-    </div>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
+      Generating your full learning plan...
     </div>
     <div class="recommendation" id="recommendationContainer"></div>
     <div class="button-group" id="actionButtons" style="display:none;">
-      <a class="btn" href="https://theeaiguy.gumroad.com/l/coufip" target="_blank">Unlock Custom Strategies</a>
       <a href="#" class="btn" onclick="downloadPlan()">Download My Plan</a>
       <a href="#" class="btn" onclick="emailPlan()">Email Me This</a>
     </div>
   </div>
 
   <script>
-    const aiqScore = localStorage.getItem('aiScore');
-    const aiqTier = localStorage.getItem('aiTier');
-    const aiqToolsUsed = JSON.parse(localStorage.getItem('aiTools') || '[]');
-    const aiqProjects = localStorage.getItem('aiProjects') || '';
-    const progressBar = document.getElementById('progressBar');
+    function getParam(key) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(key);
+    }
 
-    function animateProgressTo(target = 100, duration = 1000) {
-      const start = performance.now();
-      function frame(timestamp) {
-        const elapsed = timestamp - start;
-        const progress = Math.min(elapsed / duration, 1);
-        progressBar.style.width = (progress * target) + '%';
-        if (progress < 1) {
-          requestAnimationFrame(frame);
+    const score = getParam('score');
+    const tier = getParam('tier');
+    const tools = getParam('tools') ? decodeURIComponent(getParam('tools')).split(',') : [];
+    const projects = decodeURIComponent(getParam('projects') || '');
+
+    document.getElementById('scoreDisplay').innerText = score || '—';
+
+    if (score && tier) {
+      fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score,
+          tier,
+          tools,
+          projects,
+          purpose: 'full-plan-paid'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        const recommendationContainer = document.getElementById('recommendationContainer');
+        if (data.html) {
+          recommendationContainer.innerHTML = data.html;
+        } else {
+          recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
         }
-      }
-      requestAnimationFrame(frame);
+        document.getElementById('actionButtons').style.display = 'block';
+      })
+      .catch(err => {
+        document.getElementById('loading').innerText = 'Error loading your custom plan.';
+        console.error(err);
+      });
+    } else {
+      document.getElementById('loading').innerText = "Missing data. Please re-take the assessment.";
     }
 
     function downloadPlan() {
@@ -167,46 +170,10 @@
       const mailtoLink = `mailto:?subject=My AIQ Learning Plan&body=${encodeURIComponent(content)}`;
       window.location.href = mailtoLink;
     }
-
-    if (aiqScore && aiqTier) {
-      document.getElementById('scoreDisplay').textContent = aiqScore;
-      animateProgressTo(100, 1500);
-
-      fetch('/api/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          score: aiqScore, 
-          tier: aiqTier, 
-          tools: aiqToolsUsed, 
-          projects: aiqProjects 
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('loading').style.display = 'none';
-        const recommendationContainer = document.getElementById('recommendationContainer');
-        if (data.html) {
-          recommendationContainer.innerHTML = data.html;
-        } else if (data.message) {
-          recommendationContainer.innerHTML = `<p>${data.message}</p>`;
-        } else {
-          recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
-        }
-        document.getElementById('actionButtons').style.display = 'block';
-        progressBar.style.width = '100%';
-      })
-      .catch(err => {
-        document.getElementById('loading').innerText = 'Error loading plan.';
-        console.error(err);
-      });
-    } else {
-      document.getElementById('scoreDisplay').innerText = "Unable to load your score.";
-      document.getElementById('loading').style.display = 'none';
-    }
   </script>
 </body>
 </html>
+
 
 
 
