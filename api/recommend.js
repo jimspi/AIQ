@@ -1,4 +1,3 @@
-// /api/recommend.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -47,14 +46,19 @@ Based on this, give a quick 2-sentence teaser of how AI could improve their work
     });
 
     const data = await response.json();
-    const message = data.choices?.[0]?.message?.content?.trim() || 'Keep building your AI skills.';
-    res.status(200).json({ message });
+    console.log('OpenAI response:', data); // 👈 helps you debug
+
+    const message = data.choices?.[0]?.message?.content?.trim();
+    if (!message) throw new Error('Empty message from OpenAI');
+
+    // Return a consistent JSON shape
+    res.status(200).json({ html: `<p>${message.replace(/\n/g, '<br>')}</p>` });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to generate message' });
+    console.error('Error in recommend API:', error);
+    res.status(500).json({ error: 'AI plan generation failed.' });
   }
 }
-pi/recommend.js
+
 
 
 
