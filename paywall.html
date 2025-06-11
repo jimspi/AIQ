@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIQ Score Ready</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Unlock Your Personalized AI Plan</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
   <style>
     body {
@@ -27,10 +27,21 @@
       color: #003366;
       margin-bottom: 0.25em;
     }
-    p {
-      font-size: 1.1em;
-      color: #333;
-      margin-bottom: 1.5em;
+    .score-highlight {
+      color: #007bff;
+      font-size: 2.5em;
+      font-weight: bold;
+      margin: 1em 0;
+    }
+    .loading {
+      font-size: 1.2em;
+      color: #555;
+      margin-top: 2em;
+    }
+    .recommendation {
+      text-align: left;
+      font-size: 1em;
+      margin-top: 2em;
     }
     .cta {
       display: inline-block;
@@ -44,6 +55,7 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
       text-decoration: none;
+      margin-top: 2em;
     }
     .cta:hover {
       background-color: #005bb5;
@@ -53,28 +65,53 @@
 <body>
   <div class="container">
     <h1>Your AIQ Score is Ready</h1>
-    <p id="scoreSummary">Loading score and summary...</p>
-    <a class="cta" href="/access.html">View My Plan</a>
+    <div class="score-highlight" id="scoreSummary">Loading...</div>
+    <div class="recommendation" id="recommendationContainer"></div>
+    <a class="cta" id="gumroadLink" href="#" target="_blank" style="display:none">Unlock Your Full Plan</a>
   </div>
 
   <script>
     const score = localStorage.getItem('aiScore');
     const tier = localStorage.getItem('aiTier');
     const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
-    const answers = JSON.parse(localStorage.getItem('aiAnswers') || '[]');
     const projects = localStorage.getItem('aiProjects') || '';
 
     if (score && tier) {
-      document.getElementById('scoreSummary').innerText = `You scored ${score}, placing you in the “${tier}” tier.`;
+      document.getElementById('scoreSummary').innerText = `Your Score: ${score} (${tier})`;
+
+      fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score,
+          tier,
+          tools,
+          projects
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('recommendationContainer');
+        if (data.html) {
+          container.innerHTML = data.html;
+        } else if (data.message) {
+          container.innerHTML = `<p>${data.message}</p>`;
+        } else {
+          container.innerHTML = '<p>No personalized recommendations available.</p>';
+        }
+
+        // SHOW CTA
+        const gumroadLink = document.getElementById('gumroadLink');
+        gumroadLink.href = 'https://your-gumroad-product-link'; // REPLACE with your Gumroad link
+        gumroadLink.style.display = 'inline-block';
+      })
+      .catch(err => {
+        document.getElementById('scoreSummary').innerText = "Unable to load your score.";
+        console.error(err);
+      });
     } else {
-      document.getElementById('scoreSummary').innerText = "Unable to load your score. Please retake the assessment.";
+      document.getElementById('scoreSummary').innerText = "Unable to load your score.";
     }
   </script>
 </body>
 </html>
-
-
-
-
-
-
