@@ -25,14 +25,16 @@ function recordAnswer(points) {
 }
 
 function recordTools() {
-  const tools = document.querySelectorAll('input[name="tools"]:checked');
-  score += tools.length * 5;
+  const selectedTools = Array.from(document.querySelectorAll('input[name="tools"]:checked')).map(input => input.value);
+  localStorage.setItem('aiTools', JSON.stringify(selectedTools)); // ✅ Save tools
+  score += selectedTools.length * 5;
   currentStep++;
   showStep(currentStep);
 }
 
 function calculateScore() {
   const projectText = document.getElementById('projects').value.trim();
+  localStorage.setItem('aiProjects', projectText); // ✅ Save projects
   score += Math.min(projectText.length / 10, 50);
 
   document.querySelector('.container').style.display = 'none';
@@ -55,4 +57,5 @@ function getTier(score) {
 window.addEventListener('DOMContentLoaded', () => {
   updateProgressBar();
 });
+
 
