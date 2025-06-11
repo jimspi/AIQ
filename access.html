@@ -53,39 +53,48 @@
     <div class="loading" id="loading">Loading your learning plan...</div>
     <div class="recommendation" id="recommendationContainer"></div>
   </div>
- <script>
-  const aiqScore = localStorage.getItem('aiScore');
-  const aiqTier = localStorage.getItem('aiTier');
-  const aiqToolsUsed = JSON.parse(localStorage.getItem('aiTools') || '[]');
-  const aiqProjects = localStorage.getItem('aiProjects') || '';
 
-  if (aiqScore && aiqTier) {
-    document.getElementById('scoreDisplay').innerText = `Your Score: ${aiqScore} (${aiqTier})`;
+  <script>
+    const aiqScore = localStorage.getItem('aiScore');
+    const aiqTier = localStorage.getItem('aiTier');
+    const aiqToolsUsed = JSON.parse(localStorage.getItem('aiTools') || '[]');
+    const aiqProjects = localStorage.getItem('aiProjects') || '';
 
-    fetch('/api/recommend', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        score: aiqScore, 
-        tier: aiqTier, 
-        tools: aiqToolsUsed, 
-        projects: aiqProjects 
+    if (aiqScore && aiqTier) {
+      document.getElementById('scoreDisplay').innerText = `Your Score: ${aiqScore} (${aiqTier})`;
+
+      fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          score: aiqScore, 
+          tier: aiqTier, 
+          tools: aiqToolsUsed, 
+          projects: aiqProjects 
+        })
       })
-    })
-    .then(res => res.json())
-    .then(data => {
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('loading').style.display = 'none';
+        const recommendationContainer = document.getElementById('recommendationContainer');
+        if (data.html) {
+          recommendationContainer.innerHTML = data.html;
+        } else if (data.message) {
+          recommendationContainer.innerHTML = `<p>${data.message}</p>`;
+        } else {
+          recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
+        }
+      })
+      .catch(err => {
+        document.getElementById('loading').innerText = 'Error loading plan.';
+        console.error(err);
+      });
+    } else {
+      document.getElementById('scoreDisplay').innerText = "Unable to load your score.";
       document.getElementById('loading').style.display = 'none';
-      document.getElementById('recommendationContainer').innerHTML = data.html || '<p>No personalized recommendations available.</p>';
-    })
-    .catch(err => {
-      document.getElementById('loading').innerText = 'Error loading plan.';
-      console.error(err);
-    });
-  } else {
-    document.getElementById('scoreDisplay').innerText = "Unable to load your score.";
-    document.getElementById('loading').style.display = 'none';
-  }
-</script>
+    }
+  </script>
 </body>
 </html>
+
 
