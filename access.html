@@ -53,35 +53,39 @@
     <div class="loading" id="loading">Loading your learning plan...</div>
     <div class="recommendation" id="recommendationContainer"></div>
   </div>
+ <script>
+  const aiqScore = localStorage.getItem('aiScore');
+  const aiqTier = localStorage.getItem('aiTier');
+  const aiqToolsUsed = JSON.parse(localStorage.getItem('aiTools') || '[]');
+  const aiqProjects = localStorage.getItem('aiProjects') || '';
 
-  <script>
-    const score = localStorage.getItem('aiScore');
-    const tier = localStorage.getItem('aiTier');
-    const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
-    const projects = localStorage.getItem('aiProjects') || '';
+  if (aiqScore && aiqTier) {
+    document.getElementById('scoreDisplay').innerText = `Your Score: ${aiqScore} (${aiqTier})`;
 
-    if (score && tier) {
-      document.getElementById('scoreDisplay').innerText = `Your Score: ${score} (${tier})`;
-
-      fetch('/api/recommend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score, tier, tools, projects })
+    fetch('/api/recommend', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        score: aiqScore, 
+        tier: aiqTier, 
+        tools: aiqToolsUsed, 
+        projects: aiqProjects 
       })
-        .then(res => res.json())
-        .then(data => {
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('recommendationContainer').innerHTML = data.html || '<p>No personalized recommendations available.</p>';
-        })
-        .catch(err => {
-          document.getElementById('loading').innerText = 'Error loading plan.';
-          console.error(err);
-        });
-    } else {
-      document.getElementById('scoreDisplay').innerText = "Unable to load your score.";
+    })
+    .then(res => res.json())
+    .then(data => {
       document.getElementById('loading').style.display = 'none';
-    }
-  </script>
+      document.getElementById('recommendationContainer').innerHTML = data.html || '<p>No personalized recommendations available.</p>';
+    })
+    .catch(err => {
+      document.getElementById('loading').innerText = 'Error loading plan.';
+      console.error(err);
+    });
+  } else {
+    document.getElementById('scoreDisplay').innerText = "Unable to load your score.";
+    document.getElementById('loading').style.display = 'none';
+  }
+</script>
 </body>
 </html>
 
