@@ -113,7 +113,8 @@
     <div class="score-highlight" id="scoreDisplay"></div>
     <div class="loading" id="loading">
       <div class="spinner"></div>
-      Loading your learning plan...\div>
+      Loading your learning plan...
+    </div>
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
@@ -128,18 +129,23 @@
     const aiqProjects = localStorage.getItem('aiProjects') || '';
 
     const progressBar = document.getElementById('progressBar');
-    let progress = 0;
-    function animateProgress() {
-      if (progress < 100) {
-        progress += 5;
-        progressBar.style.width = progress + '%';
-        requestAnimationFrame(animateProgress);
+
+    function animateProgressTo(target = 100, duration = 1000) {
+      const start = performance.now();
+      function frame(timestamp) {
+        const elapsed = timestamp - start;
+        const progress = Math.min(elapsed / duration, 1);
+        progressBar.style.width = (progress * target) + '%';
+        if (progress < 1) {
+          requestAnimationFrame(frame);
+        }
       }
+      requestAnimationFrame(frame);
     }
 
     if (aiqScore && aiqTier) {
       document.getElementById('scoreDisplay').textContent = aiqScore;
-      animateProgress();
+      animateProgressTo(100, 1500);
 
       fetch('/api/recommend', {
         method: 'POST',
@@ -176,6 +182,7 @@
   </script>
 </body>
 </html>
+
 
 
 
