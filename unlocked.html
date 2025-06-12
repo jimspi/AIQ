@@ -1,4 +1,3 @@
-<!-- Paste this full block as your unlocked.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,19 +111,14 @@
   </div>
 
   <script>
-    function getParam(key) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(key);
-    }
-
-    const score = getParam('score');
-    const tier = getParam('tier');
-    const tools = getParam('tools') ? decodeURIComponent(getParam('tools')).split(',') : [];
-    const projects = decodeURIComponent(getParam('projects') || '');
+    const score = localStorage.getItem('aiScore');
+    const tier = localStorage.getItem('aiTier');
+    const tools = JSON.parse(localStorage.getItem('aiTools') || '[]');
+    const projects = localStorage.getItem('aiProjects') || '';
 
     document.getElementById('scoreDisplay').innerText = score || '—';
 
-    if (score && tier && !sessionStorage.getItem('planGenerated')) {
+    if (score && tier) {
       fetch('/api/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -148,14 +142,11 @@
           recommendationContainer.innerHTML = '<p>No personalized recommendations available.</p>';
         }
         document.getElementById('actionButtons').style.display = 'block';
-        sessionStorage.setItem('planGenerated', 'true');
       })
       .catch(err => {
         document.getElementById('loading').innerText = 'Error loading your custom plan.';
         console.error(err);
       });
-    } else if (sessionStorage.getItem('planGenerated')) {
-      document.getElementById('loading').innerText = 'You’ve already generated your custom plan this session.';
     } else {
       document.getElementById('loading').innerText = "Missing data. Please re-take the assessment.";
     }
@@ -179,6 +170,12 @@
   </script>
 </body>
 </html>
+
+
+
+
+
+
 
 
 
