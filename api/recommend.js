@@ -3,24 +3,22 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { score, tier, tools, answers, projects, purpose } = req.body;
+  const prompt = `A user has just completed an AI skill self-assessment and paid for a personalized learning plan. Their profile is:
 
-  const basePrompt = `A user just completed an AI skill self-assessment. Here's their profile:
+- AI Score: ${score}
+- Tier: ${tier}
+- Tools Used: ${tools.join(', ') || 'None'}
+- Project Summary: ${projects || 'None'}
 
-Score: ${score}
-Tier: ${tier}
-Tools Used: ${tools.join(', ') || 'None'}
-Project Summary: ${projects || 'None'}`;
+Based on this, create a friendly, high-value, practical 3-part learning and action plan they can use this week. Tailor it to their skill level (${tier}). Use everyday language, and don’t overwhelm them with technical jargon. Avoid code-heavy tasks.
 
-  const fullPlanPrompt = `${basePrompt}
+Your response must include:
+1. A real-world concept or application of AI that fits their score and experience. Explain what it means and why it matters for everyday life or work.
+2. A no-code project idea they can try this week using a free tool, or another level appropriate-friendly option. Be specific — walk them through what to do step-by-step.
+3. A new tool, tip, or strategy they likely haven’t used yet — something powerful but simple, with an example of how to start using it today.
 
-Generate a detailed, three-part AI learning and application plan tailored to their score and responses. Include:
+Make it feel like expert coaching — practical, encouraging, and worth the $25 they paid. Don’t overwhelm. Instead, spark confidence and momentum. Add a warm closing line like a coach would say. Keep it under 600 tokens.`;
 
-1. One specific AI concept or technique they should master next, and explain it clearly.
-2. A guided mini-project or task they can do this week using that concept.
-3. One overlooked tool or strategy they likely aren't using — with clear instructions on how to start.
-
-Write in a helpful, motivating tone, and assume they just paid $25 for this, so overdeliver on value. Keep it digestible but insightful.`;
 
   const teaserPrompt = `${basePrompt}
 
