@@ -25,7 +25,7 @@ Your response must include:
 2. A no-code project idea they can try this week using a free tool, or another level-appropriate option. Be specific — walk them through what to do step-by-step.
 3. A new tool, tip, or strategy they likely haven’t used yet — something powerful but simple, with an example of how to start using it today.
 
-Make it feel like expert coaching — practical, encouraging, and worth the $25 they paid. Don’t overwhelm. Instead, spark confidence and momentum. Add a warm closing line like a coach would say. Keep it under 600 tokens.`;
+The feel should feel like expert coaching — practical, encouraging, and worth the $25 they paid. Don’t overwhelm. Instead, spark confidence and momentum. Keep it under 600 tokens.`;
 
   const teaserPrompt = `${basePrompt}
 
